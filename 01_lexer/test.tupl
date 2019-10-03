@@ -1,0 +1,8 @@
+MEANING <- 42.
+N <- 7.
+variable <- 7 + 3.
+<mytuple> <- [ 1 , 2, 1+2 ].
+
+message <- "Hello popl".
+Print[message].
+[ message, "again" ] | Print.
