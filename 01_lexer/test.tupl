@@ -1,8 +1,31 @@
+define Squares[arg]
+begin
+  [arg * arg].
+end.
+
+[1..10] | each: Squares -> Print.
+
 MEANING <- 42.
 N <- 7.
-variable <- 7 + 3.
+variable<- 7 + 3.
 <mytuple> <- [ 1 , 2, 1+2 ].
 
 message <- "Hello popl".
 Print[message].
 [ message, "again" ] | Print.
+
+define Modulus2[arg]
+begin
+	[arg%2].
+end.
+
+num1 **2
+3%3
+
+define F_begin_unc_define_0[arg]
+F <- "this should < be constant % not { func with } string literal"
+
+4 >= 2
+4<=2
+
+this_is_invalid >- "ds

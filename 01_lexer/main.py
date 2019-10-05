@@ -2,7 +2,16 @@
 
 import sys
 import ply.lex as lex
-tokens = (
+
+reserved = {
+    'define': 'DEFINE',
+    'begin': 'BEGIN',
+    'end': 'END',
+    'each': 'EACH',
+    'select': 'SELECT',
+}
+
+tokens = [
     'COMMENT',
     'LARROW',
     'RARROW',
@@ -35,7 +44,7 @@ tokens = (
     'tupleIDENT',
     'funcIDENT',
     'NEWLINE',
-)
+] + list(reserved.values())
 
 t_LARROW = r'<-'
 t_RARROW = r'->'
@@ -63,6 +72,32 @@ t_DIV = r'\/'
 t_MOD = r'\%'
 
 t_ignore = ' \t'
+
+
+def t_DEFINE(t):
+    r'\bdefine\b'
+    t.type = reserved.get(t.value, 'DEFINE')
+    return t
+
+def t_BEGIN(t):
+    r'\bbegin\b'
+    t.type = reserved.get(t.value, 'BEGIN')
+    return t
+
+def t_END(t):
+    r'\bend\b'
+    t.type = reserved.get(t.value, 'END')
+    return t
+
+def t_EACH(t):
+    r'\beach\b'
+    t.type = reserved.get(t.value, 'EACH')
+    return t
+
+def t_SELECT(t):
+    r'\bselect\b'
+    t.type = reserved.get(t.value, 'SELECT')
+    return t
 
 
 def t_COMMENT(t):
@@ -99,7 +134,6 @@ def t_funcIDENT(t):
     return t
 
 
-
 def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
@@ -107,7 +141,6 @@ def t_NEWLINE(t):
 
 def t_error(t):
     print("Illegal character '{}' at line {}".format(t.value[0], t.lexer.lineno))
-
 
 
 lexer = lex.lex()
@@ -118,7 +151,7 @@ if __name__ == '__main__':
     argument_parser = argparse.ArgumentParser()
     argument_group = argument_parser.add_mutually_exclusive_group()
     argument_group.add_argument('--who', action='store_true', help='author')
-    argument_group.add_argument('-f', '--file', help='input filename for lexical analysis')
+    argument_group.add_argument('-f', '--file', help='<FILENAME>.tupl')
 
     input_args_parsed = argument_parser.parse_args()
     if input_args_parsed.who:
@@ -135,6 +168,6 @@ if __name__ == '__main__':
                 for token in lexer:
                     print(token)
         except FileNotFoundError:
-            print("File not found: '{}'".format(file))
+            print("File not found: '{}', maybe you forgot or mistyped the suffix".format(file))
         except lex.LexError as lexError:
             print("Shutting down lexer because of error: \n {}".format(lexError))
