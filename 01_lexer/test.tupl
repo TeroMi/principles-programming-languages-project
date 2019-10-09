@@ -17,15 +17,18 @@ Print[message].
 define Modulus2[arg]
 begin
 	[arg%2].
-end.
+end. asd deed Func
 
 num1 **2
 3%3
-
+{
+comment _block<
+-This gets ignored so there can be anything !¤%!"¤"#%"#¤"¤"
+}
 define F_begin_unc_define_0[arg]
 F <- "this should < be constant % not { func with } string literal"
 
-4 >= 2
-4<=2
+4<2 | 4 > 2
+
 
 this_is_invalid >- "ds

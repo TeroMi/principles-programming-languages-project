@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import re
 import ply.lex as lex
 
 reserved = {
@@ -73,7 +74,6 @@ t_MOD = r'\%'
 
 t_ignore = ' \t'
 
-
 def t_DEFINE(t):
     r'\bdefine\b'
     t.type = reserved.get(t.value, 'DEFINE')
@@ -102,6 +102,8 @@ def t_SELECT(t):
 
 def t_COMMENT(t):
     r'\{((.|\s)*?)\}'
+    comment_line_count = t.value.count('\n')
+    t.lexer.lineno += comment_line_count
 
 
 def t_NUMBER_LITERAL(t):
@@ -140,7 +142,12 @@ def t_NEWLINE(t):
 
 
 def t_error(t):
-    print("Illegal character '{}' at line {}".format(t.value[0], t.lexer.lineno))
+    error_line = re.split('\n', t.value)[0]
+    if error_line == "":
+        error_line = ""
+    else:
+        error_line = ", in input: \n{}\n^".format(error_line)
+    print("Illegal character '{}' at line {}{}".format(t.value[0], t.lexer.lineno, error_line))
 
 
 lexer = lex.lex()
@@ -170,4 +177,7 @@ if __name__ == '__main__':
         except FileNotFoundError:
             print("File not found: '{}', maybe you forgot or mistyped the suffix".format(file))
         except lex.LexError as lexError:
-            print("Shutting down lexer because of error: \n {}".format(lexError))
+            if "Illegal" not in str(lexError):
+                print("Shutting down lexer because of error: \n {}".format(lexError))
+            else:
+                print("Shutting down ..")
