@@ -6,50 +6,53 @@ tokens = lexer.tokens
 import ply.yacc as yacc
 # E <- 3 + 2.
 
-precedence = (
-    ('left', 'PLUS', 'MINUS'),
-    ('left', 'MULT', 'DIV')
-)
+
+def p_program(p):
+    '''program : program return_value DOT
+               | variable_definitions
+               | return_value DOT'''
+    print("program")
+
+
+def p_function_or_variable_definition(p):
+    '''function_or_variable_definition : variable_definitions'''
+
+
+def p_function_definition(p):
+    ''''''
+
+def p_formals(p):
+    '''formals : varIDENT formals
+               | COMMA varIDENT
+               | COMMA varIDENT formals
+               | varIDENT '''
+
+
+def p_return_value(p):
+    '''return_value : EQ simple_expression'''
+
 
 def p_variable_definitions(p):
     '''variable_definitions : varIDENT LARROW simple_expression DOT
                             | constIDENT LARROW constant_expression DOT'''
-    p[0] = p[1]
-    print("variable_definition({})".format(p[1]))
 
+    if p.slice[1].type == 'varIDENT':
+        print("variable_definition({})".format(p[1]))
+    elif p.slice[1].type == 'constIDENT':
+        print("constant_definition({})".format(p[1]))
 
-def p_simple_expression(p):
-    '''simple_expression : term PLUS term
-                         | term MINUS term
-                         | term'''
-    if p[2] == '+':
-        p[0] = p[1] + p[3]
-    if p[2] == '-':
-        p[0] = p[1] + p[3]
-    else:
-        p[0] = p[1]
-    print("simple_expression")
 
 
 def p_constant_expression(p):
     '''constant_expression : constIDENT
                            | NUMBER_LITERAL'''
-    p[0] = p[1]
-    print("constant_expression({})".format(p[1]))
 
-def p_term(p):
-    '''term : factor MULT factor
-            | factor DIV factor
-            | factor'''
-    if len(p) == 4:
-        print("term({}{}{})".format(p[1], p[2], p[3]))
-    else:
-        print("term")
 
-def p_factor(p):
-    '''factor : atom
-              | MINUS atom'''
-    print("factor")
+def p_arguments(p):
+    '''arguments : simple_expression arguments
+                 | COMMA simple_expression
+                 | COMMA simple_expression arguments
+                 | simple_expression'''
 
 
 def p_atom(p):
@@ -65,8 +68,36 @@ def p_atom(p):
         print("atom({})".format(p[1]))
 
 
+def p_factor(p):
+    '''factor : atom
+              | MINUS atom'''
+    print("factor")
+
+
+def p_term(p):
+    '''term : factor
+            | term MULT factor
+            | term DIV factor'''
+    if len(p) == 4:
+        print("term({}{}{})".format(p[1], p[2], p[3]))
+    else:
+        print("term")
+
+
+def p_simple_expression(p):
+    '''simple_expression : term
+                         | simple_expression PLUS term
+                         | simple_expression MINUS term
+                         '''
+    print("simple_expression")
+
+
+def p_empty(p):
+    'empty :'
+    pass
+
 def p_error(p):
-    print("ERROR in token {} {}".format(p.type, p.value))
+    print("ERROR in token {}".format(p.error))
 
 
 parser = yacc.yacc(debug=True)
