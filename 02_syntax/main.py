@@ -8,39 +8,42 @@ import ply.yacc as yacc
 
 
 def p_program(p):
-    '''program : program return_value DOT
-               | variable_definitions
+    '''program : function_or_variable_definition program
                | return_value DOT'''
-    print("program")
 
 
 def p_function_or_variable_definition(p):
     '''function_or_variable_definition : variable_definitions'''
+    #print("function_or_variable_definition")
 
-
-def p_function_definition(p):
-    ''''''
-
-def p_formals(p):
-    '''formals : varIDENT formals
-               | COMMA varIDENT
-               | COMMA varIDENT formals
-               | varIDENT '''
+#def p_formals(p):
+#    '''formals : varIDENT formals
+#               | COMMA varIDENT
+#               | COMMA varIDENT formals
+#               | varIDENT '''
+#    print("formals")
 
 
 def p_return_value(p):
-    '''return_value : EQ simple_expression'''
+    '''return_value : EQ simple_expression
+                    | NOTEQ pipe_expression'''
+    print("return_value")
 
 
 def p_variable_definitions(p):
     '''variable_definitions : varIDENT LARROW simple_expression DOT
-                            | constIDENT LARROW constant_expression DOT'''
+                            | constIDENT LARROW constant_expression DOT
+                            | tupleIDENT LARROW tuple_expression DOT
+                            | pipe_expression RARROW tupleIDENT DOT'''
 
     if p.slice[1].type == 'varIDENT':
-        print("variable_definition({})".format(p[1]))
+        print("variable_definition( {} )".format(p[1]))
     elif p.slice[1].type == 'constIDENT':
-        print("constant_definition({})".format(p[1]))
-
+        print("constant_definition( {} )".format(p[1]))
+    elif p.slice[1].type == 'tupleIDENT':
+        print("tuple_definition( {} )".format(p[1]))
+    else:
+        print("tuple_definition ( {} )".format(p[3]))
 
 
 def p_constant_expression(p):
@@ -48,29 +51,67 @@ def p_constant_expression(p):
                            | NUMBER_LITERAL'''
 
 
+def p_pipe_expression(p):
+    '''pipe_expression : tuple_expression
+                       | pipe_expression PIPE pipe_operation'''
+    if len(p) == 2:
+        print("pipe_expression")
+
+
+def p_pipe_operation(p):
+    '''pipe_operation : funcIDENT
+                      | MULT
+                      | PLUS
+                      | each_statement'''
+    #print("pipe_operation")
+
+
+def p_each_statement(p):
+    '''each_statement : EACH COLON funcIDENT'''
+
+
+def p_tuple_expression(p):
+    '''tuple_expression : tuple_atom
+                        | tuple_expression tuple_operation tuple_atom'''
+    #print("tuple_expression")
+
+
+def p_tuple_operation(p):
+    '''tuple_operation : DOUBLEPLUS'''
+    #print("tuple_operation")
+
+
+def p_tuple_atom(p):
+    '''tuple_atom : tupleIDENT
+                  | LSQUARE constant_expression DOUBLEMULT constant_expression RSQUARE
+                  | LSQUARE constant_expression DOUBLEDOT  constant_expression RSQUARE
+                  | LSQUARE arguments RSQUARE'''
+    #print("tuple_atom")
+
+
 def p_arguments(p):
     '''arguments : simple_expression arguments
                  | COMMA simple_expression
                  | COMMA simple_expression arguments
                  | simple_expression'''
+    #print("arguments")
 
 
 def p_atom(p):
-    # | SELECT COLON constant_expression LSQUARE tuple_expression RSQUARE
     '''atom : NUMBER_LITERAL
             | STRING_LITERAL
             | varIDENT
             | constIDENT
-            | LPAREN simple_expression RPAREN'''
+            | LPAREN simple_expression RPAREN
+            | SELECT COLON constant_expression LSQUARE tuple_expression RSQUARE'''
     if len(p) == 4:
         print("atom")
     else:
-        print("atom({})".format(p[1]))
+        print("atom( {} )".format(p[1]))
 
 
 def p_factor(p):
-    '''factor : atom
-              | MINUS atom'''
+    '''factor : atom'''
     print("factor")
 
 
@@ -78,10 +119,7 @@ def p_term(p):
     '''term : factor
             | term MULT factor
             | term DIV factor'''
-    if len(p) == 4:
-        print("term({}{}{})".format(p[1], p[2], p[3]))
-    else:
-        print("term")
+    print("term")
 
 
 def p_simple_expression(p):
@@ -92,12 +130,17 @@ def p_simple_expression(p):
     print("simple_expression")
 
 
-def p_empty(p):
+'''def p_empty(p):
     'empty :'
     pass
+'''
 
 def p_error(p):
-    print("ERROR in token {}".format(p.error))
+    if p is not None:
+        print("{}:Syntax error (token:{})".format(p.lineno, p.value))
+    else:
+        print("Syntax error: {}".format(p))
+    raise SystemExit
 
 
 parser = yacc.yacc(debug=True)
@@ -117,6 +160,15 @@ if __name__ == '__main__':
         argument_parser.print_help()
     else:
         file = input_args_parsed.file
+        '''while True:
+            try:
+                s = input('calc > ')
+            except EOFError:
+                break
+            if not s: continue
+            result = parser.parse(s, lexer=lexer.lexer, debug=True)
+            print(result)
+        '''
         try:
             with codecs.open(file, 'r') as INFILE:
                 data = INFILE.read()

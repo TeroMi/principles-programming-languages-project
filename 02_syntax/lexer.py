@@ -45,6 +45,7 @@ tokens = [
     'tupleIDENT',
     'funcIDENT',
     'NEWLINE',
+    'ID'
 ] + list(reserved.values())
 
 t_LARROW = r'<-'
@@ -73,31 +74,6 @@ t_DIV = r'\/'
 t_MOD = r'\%'
 
 t_ignore = ' \t\r\n'
-
-def t_DEFINE(t):
-    r'\bdefine\b'
-    t.type = reserved.get(t.value, 'DEFINE')
-    return t
-
-def t_BEGIN(t):
-    r'\bbegin\b'
-    t.type = reserved.get(t.value, 'BEGIN')
-    return t
-
-def t_END(t):
-    r'\bend\b'
-    t.type = reserved.get(t.value, 'END')
-    return t
-
-def t_EACH(t):
-    r'\beach\b'
-    t.type = reserved.get(t.value, 'EACH')
-    return t
-
-def t_SELECT(t):
-    r'\bselect\b'
-    t.type = reserved.get(t.value, 'SELECT')
-    return t
 
 
 def t_COMMENT(t):
@@ -150,6 +126,10 @@ def t_error(t):
         error_line = ", in input: \n{}\n^".format(error_line)
     print("Illegal character '{}' at line {}{}".format(t.value[0], t.lexer.lineno, error_line))
 
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID')
+    return t
 
 lexer = lex.lex()
 
