@@ -4,7 +4,12 @@ import lexer
 tokens = lexer.tokens
 
 import ply.yacc as yacc
-# E <- 3 + 2.
+
+precedence = (
+     ('left', 'PLUS', 'MINUS'),
+     ('left', 'MULT', 'DIV'),
+     ('right', 'UMINUS')
+ )
 
 
 def p_program(p):
@@ -15,6 +20,11 @@ def p_program(p):
 def p_function_or_variable_definition(p):
     '''function_or_variable_definition : variable_definitions'''
     #print("function_or_variable_definition")
+
+
+def p_function_definition(p):
+    ''''''
+
 
 #def p_formals(p):
 #    '''formals : varIDENT formals
@@ -27,7 +37,7 @@ def p_function_or_variable_definition(p):
 def p_return_value(p):
     '''return_value : EQ simple_expression
                     | NOTEQ pipe_expression'''
-    print("return_value")
+    #print("return_value")
 
 
 def p_variable_definitions(p):
@@ -110,8 +120,13 @@ def p_atom(p):
         print("atom( {} )".format(p[1]))
 
 
+def p_unary_operator(p):
+    '''unary_operator : MINUS'''
+
+
 def p_factor(p):
-    '''factor : atom'''
+    '''factor : atom
+              | unary_operator factor %prec UMINUS'''
     print("factor")
 
 
@@ -143,7 +158,7 @@ def p_error(p):
     raise SystemExit
 
 
-parser = yacc.yacc(debug=True)
+parser = yacc.yacc()
 
 
 if __name__ == '__main__':

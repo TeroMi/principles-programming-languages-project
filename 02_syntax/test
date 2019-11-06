@@ -1,7 +1,13 @@
 N <- 10.
 [1..N] | * -> <factorialten>.
 <doubles> | + -> <sumofdoubles>.
-ab <- 7.
+ab <- "a"+"b".
+nn <- N.
 iI <- 999.
+xx <- -1.
+yy <-1.
+bb <- xx--yy.
+ew <- 4+6*5.
+vv <- --xx.
 i9_abc <- 0.  a9 <- 9.
 = "end".
