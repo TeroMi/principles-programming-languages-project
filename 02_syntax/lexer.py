@@ -95,11 +95,13 @@ def t_STRING_LITERAL(t):
 
 def t_varIDENT(t):
     r'\b[a-z][a-zA-Z0-9_]+'
+    t.type = reserved.get(t.value, 'varIDENT')
     return t
 
 
 def t_constIDENT(t):
     r'\b[A-Z]+\b'
+    t.type = reserved.get(t.value, 'constIDENT')
     return t
 
 
@@ -117,6 +119,13 @@ def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
+'''
+Reserved words
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID')
+    return t
+'''
 
 def t_error(t):
     error_line = re.split('\n', t.value)[0]
@@ -126,10 +135,6 @@ def t_error(t):
         error_line = ", in input: \n{}\n^".format(error_line)
     print("Illegal character '{}' at line {}{}".format(t.value[0], t.lexer.lineno, error_line))
 
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'ID')
-    return t
 
 lexer = lex.lex()
 

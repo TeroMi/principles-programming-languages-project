@@ -18,20 +18,25 @@ def p_program(p):
 
 
 def p_function_or_variable_definition(p):
-    '''function_or_variable_definition : variable_definitions'''
-    #print("function_or_variable_definition")
+    '''function_or_variable_definition : variable_definitions
+                                        | function_definition'''
+    print("function_or_variable_definition")
 
 
 def p_function_definition(p):
-    ''''''
+    '''function_definition : DEFINE funcIDENT LSQUARE formals RSQUARE \
+                             BEGIN \
+                             return_value DOT \
+                             END DOT'''
+    print("func definition {}".format(p[2]))
 
 
-#def p_formals(p):
-#    '''formals : varIDENT formals
-#               | COMMA varIDENT
-#               | COMMA varIDENT formals
-#               | varIDENT '''
-#    print("formals")
+def p_formals(p):
+    '''formals : varIDENT formals
+               | COMMA varIDENT
+               | COMMA varIDENT formals
+               | varIDENT '''
+    print("formals")
 
 
 def p_return_value(p):
@@ -99,6 +104,11 @@ def p_tuple_atom(p):
     #print("tuple_atom")
 
 
+def p_function_call(p):
+    '''function_call : funcIDENT LSQUARE RSQUARE
+                     | '''
+
+
 def p_arguments(p):
     '''arguments : simple_expression arguments
                  | COMMA simple_expression
@@ -108,7 +118,8 @@ def p_arguments(p):
 
 
 def p_atom(p):
-    '''atom : NUMBER_LITERAL
+    '''atom : function_call
+            | NUMBER_LITERAL
             | STRING_LITERAL
             | varIDENT
             | constIDENT
@@ -126,7 +137,7 @@ def p_unary_operator(p):
 
 def p_factor(p):
     '''factor : atom
-              | unary_operator factor %prec UMINUS'''
+              | unary_operator atom %prec UMINUS'''
     print("factor")
 
 
