@@ -18,31 +18,28 @@ def p_program(p):
 
 
 def p_function_or_variable_definition(p):
-    '''function_or_variable_definition : variable_definitions
-                                        | function_definition'''
-    print("function_or_variable_definition")
+    '''function_or_variable_definition : variable_definitions'''
 
-
-def p_function_definition(p):
-    '''function_definition : DEFINE funcIDENT LSQUARE formals RSQUARE \
-                             BEGIN \
-                             return_value DOT \
-                             END DOT'''
-    print("func definition {}".format(p[2]))
-
-
-def p_formals(p):
-    '''formals : varIDENT formals
-               | COMMA varIDENT
-               | COMMA varIDENT formals
-               | varIDENT '''
-    print("formals")
+# Function stuff for later
+# def p_function_definition(p):
+#     '''function_definition : DEFINE funcIDENT LSQUARE formals RSQUARE \
+#                              BEGIN \
+#                              return_value DOT \
+#                              END DOT'''
+#     print("func definition {}".format(p[2]))
+#
+#
+# def p_formals(p):
+#     '''formals : varIDENT formals
+#                | COMMA varIDENT
+#                | COMMA varIDENT formals
+#                | varIDENT '''
+#     print("formals")
 
 
 def p_return_value(p):
     '''return_value : EQ simple_expression
                     | NOTEQ pipe_expression'''
-    #print("return_value")
 
 
 def p_variable_definitions(p):
@@ -78,7 +75,6 @@ def p_pipe_operation(p):
                       | MULT
                       | PLUS
                       | each_statement'''
-    #print("pipe_operation")
 
 
 def p_each_statement(p):
@@ -88,12 +84,10 @@ def p_each_statement(p):
 def p_tuple_expression(p):
     '''tuple_expression : tuple_atom
                         | tuple_expression tuple_operation tuple_atom'''
-    #print("tuple_expression")
 
 
 def p_tuple_operation(p):
     '''tuple_operation : DOUBLEPLUS'''
-    #print("tuple_operation")
 
 
 def p_tuple_atom(p):
@@ -101,12 +95,11 @@ def p_tuple_atom(p):
                   | LSQUARE constant_expression DOUBLEMULT constant_expression RSQUARE
                   | LSQUARE constant_expression DOUBLEDOT  constant_expression RSQUARE
                   | LSQUARE arguments RSQUARE'''
-    #print("tuple_atom")
 
 
-def p_function_call(p):
-    '''function_call : funcIDENT LSQUARE RSQUARE
-                     | '''
+# def p_function_call(p):
+#     '''function_call : funcIDENT LSQUARE RSQUARE
+#                      | '''
 
 
 def p_arguments(p):
@@ -118,8 +111,7 @@ def p_arguments(p):
 
 
 def p_atom(p):
-    '''atom : function_call
-            | NUMBER_LITERAL
+    '''atom : NUMBER_LITERAL
             | STRING_LITERAL
             | varIDENT
             | constIDENT
@@ -156,11 +148,6 @@ def p_simple_expression(p):
     print("simple_expression")
 
 
-'''def p_empty(p):
-    'empty :'
-    pass
-'''
-
 def p_error(p):
     if p is not None:
         print("{}:Syntax error (token:{})".format(p.lineno, p.value))
@@ -186,15 +173,6 @@ if __name__ == '__main__':
         argument_parser.print_help()
     else:
         file = input_args_parsed.file
-        '''while True:
-            try:
-                s = input('calc > ')
-            except EOFError:
-                break
-            if not s: continue
-            result = parser.parse(s, lexer=lexer.lexer, debug=True)
-            print(result)
-        '''
         try:
             with codecs.open(file, 'r') as INFILE:
                 data = INFILE.read()

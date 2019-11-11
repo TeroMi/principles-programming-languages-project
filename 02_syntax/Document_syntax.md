@@ -55,10 +55,11 @@
 
     By defining them in the precedence rules
 #### **5.**
-* Didn't implement functions
+* Didn't implement functions.
 
 #### **6.**
 * Quite fun exercise, harder than the previous one for sure. Was quite confused sometimes because the debug was bit cumbersome at times.
 * EBNF -> BNF conversion was harder than I thought, but once I understood it made sense how it works.
+* Would've wanted to implement functions, but due to my personal schedules couldn't get them to work on time. Might still implement them for fun.
  
 
