@@ -186,21 +186,29 @@ def p_term(p):
     #p[0] = p[1]
     p[0] = ASTnode("factor")
     p[0].value = p[1].value
-    p[0].child_factor = p[1]
+    p[0].children_factor = [p[1]]
 
 
 def p_term_mult(p):
     '''term : term MULT factor'''
-    p[0] = ASTnode("term")
+    p[0] = p[1]#ASTnode("term")
+    print("{} {} {}".format(p[1],p[3],p[3].value))
     p[0].value = p[1].value * p[3].value
+    p[0].children_factor.append(p[3])
+    #p[0].children_factor[1].child_operator = p[2]
 
 
 def p_term_div(p):
     '''term : term DIV factor'''
-    p[0] = ASTnode("term")
+    p[0] = p[1]#= ASTnode("term")
+    print("{} {} {} {}".format(p[1].nodetype, p[1].value, p[3].nodetype, p[3].value))
     try:
         p[0].value = p[1].value / p[3].value
+        #p[0].child_factor = p[1]
+        p[0].children_factor.append(p[3])
+        p[0].children_operator = p[2]
     except ZeroDivisionError:
+        parser.errorfunc(p)
         #yacc.YaccProduction.parser
         print("ERROR: Division by zero")
         raise SystemExit
@@ -216,7 +224,7 @@ def p_simple_expression_term(p):
 def p_simple_expression_minus(p):
     '''simple_expression : simple_expression MINUS term'''
     print("{} {}".format(p[1].value, p[3].value))
-    p[0] = ASTnode("minus_expression")
+    p[0] = p[1]#ASTnode("minus_expression")
     p[0].children_terms = []
     p[0].children_terms.append(p[1])
     p[0].children_terms.append(p[3])
