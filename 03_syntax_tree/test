@@ -1,4 +1,27 @@
-asd <- 2*5*2.
-REE <- 2.
-kek <- "Yea".
-= 2.
+{<testi> <- [1..6].
+<p> <- [1,2,3] ++ <d> ++ <asd>.
+re <- -2+3+3.
+rerere <- 3-2.
+jeje <- (3/3)*(4/5)+2*3.
+<asd> <- [3,4,5].
+<ree> <- <asd>.
+[1,2,3,4,5] | + -> <ree>.
+<ree> -> <asd>.
+CONST <- 4.
+GEE <- CONST.
+reeree <- select : 5 [<asd>].}
+
+<p> <- [1,2,3] ++ <d> ++ <asd>.
+[1,2,3,4,5] | each : Funccis -> <ree>.
+
+define Funccis [kek,ree,vii]
+begin
+    asd <- 2.
+    REE <- 2.
+    www <- 3.
+    <tuple> <- [2,3].
+    = asd.
+end.
+
+<d> <- Funccis[3,4,5].
+= "keke".

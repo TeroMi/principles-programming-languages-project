@@ -29,36 +29,59 @@ def p_program_variables(p):
 
 
 def p_function_or_variable_definition(p):
-    '''function_or_variable_definition : variable_definitions'''
+    '''function_or_variable_definition : variable_definitions
+                                       | function_definition'''
     p[0] = p[1]
 
 
 # Function stuff for later
-# def p_function_definition(p):
-#     '''function_definition : DEFINE funcIDENT LSQUARE formals RSQUARE \
-#                              BEGIN \
-#                              return_value DOT \
-#                              END DOT'''
-#     print("func definition {}".format(p[2]))
-#
-#
-# def p_formals(p):
-#     '''formals : varIDENT formals
-#                | COMMA varIDENT
-#                | COMMA varIDENT formals
-#                | varIDENT '''
-#     print("formals")
+def p_function_definition(p):
+    '''function_definition : DEFINE funcIDENT LSQUARE formals RSQUARE \
+                             BEGIN \
+                             function_variable_definitions \
+                             return_value DOT \
+                             END DOT'''
+    p[0] = ASTnode("function_definition")
+    p[0].value = p[2]
+    p[0].children_formals = p[4].children_formals
+
+
+def p_function_variable_definitions(p):
+    '''function_variable_definitions : variable_definitions
+                                     | function_variable_definitions variable_definitions
+                                     | '''
+    p[0] = p[1]
+
+
+def p_formals_var(p):
+    '''formals : varIDENT'''
+    p[0] = ASTnode("formals")
+    temp_var = ASTnode("varIDENT")
+    temp_var.value = p[1]
+    p[0].children_formals = [temp_var]
+
+def p_formals_vars(p):
+    '''formals : formals COMMA varIDENT'''
+    p[0] = p[1]
+    temp_var = ASTnode("varIDENT")
+    temp_var.value = p[3]
+    p[0].children_formals.append(temp_var)
+
+
+def p_formals_empty(p):
+    '''formals : '''
+    p[0] = ASTnode("formals")
+    p[0].children_formals = []
 
 
 def p_return_value_eq(p):
     '''return_value : EQ simple_expression'''
     p[0] = ASTnode("return_value")
-    p[0].child_operator = ASTnode(p[1])
     p[0].child_expression = p[2]
 
 
 def p_return_value_noteq(p):
-    '''return_value : EQ pipe_expression'''
+    '''return_value : NOTEQ pipe_expression'''
     p[0] = ASTnode("return_value")
     p[0].child_operator = ASTnode(p[1])
     p[0].child_expression = p[2]
@@ -67,28 +90,32 @@ def p_return_value_noteq(p):
 
 def p_variable_definitions_var(p):
     '''variable_definitions : varIDENT LARROW simple_expression DOT'''
-    print("variable_definition( {} )".format(p[1]))
     p[0] = ASTnode("variable definition")
     p[0].value = p[1]
-    p[0].child_definition = p[3]
+    p[0].child_expression = p[3]
 
 
 def p_variable_definitions_constant(p):
     '''variable_definitions : constIDENT LARROW constant_expression DOT'''
-    print("constant_definition( {} )".format(p[1]))
     p[0] = ASTnode("constant definition")
     p[0].value = p[1]
-    p[0].child_constant_expression = p[3]
+    p[0].child_expression = p[3]
+    print("const {}".format(p[1]))
 
 
 def p_variable_definitions_tuple(p):
     '''variable_definitions : tupleIDENT LARROW tuple_expression DOT'''
-    print("tuple_definition( {} )".format(p[1]))
+    p[0] = ASTnode("tuple_definition")
+    p[0].value = p[1]
+    p[0].child_expression = p[3]
+    print("tuple")
 
 
 def p_variable_definitions_tuple_pipe(p):
     '''variable_definitions : pipe_expression RARROW tupleIDENT DOT'''
-    print("tuple_definition ( {} )".format(p[3]))
+    p[0] = ASTnode("tuple pipe definition")
+    p[0].value = p[3]
+    p[0].child_pipe_expression = p[1]
 
 
 def p_constant_expression(p):
@@ -98,52 +125,102 @@ def p_constant_expression(p):
     p[0].value = p[1]
 
 
+def p_pipe_expression_tuple(p):
+    '''pipe_expression : tuple_expression'''
+    p[0] = p[1]
+
+
 def p_pipe_expression(p):
-    '''pipe_expression : tuple_expression
-                       | pipe_expression PIPE pipe_operation'''
-    if len(p) == 2:
-        print("pipe_expression")
+    '''pipe_expression : pipe_expression PIPE pipe_operation'''
+    p[0] = p[3]
+    p[0].child_expression = p[1]
 
 
 def p_pipe_operation(p):
     '''pipe_operation : funcIDENT
                       | MULT
-                      | PLUS
-                      | each_statement'''
+                      | PLUS'''
+    p[0] = ASTnode(p.slice[1].type)
+    p[0].value = p[1]
+
+
+def p_pipe_operation_each(p):
+    '''pipe_operation : each_statement'''
+    p[0] = p[1]
 
 
 def p_each_statement(p):
     '''each_statement : EACH COLON funcIDENT'''
+    p[0] = ASTnode("each_statement")
+    p[0].child_from = ASTnode(p[3])
 
 
 def p_tuple_expression(p):
     '''tuple_expression : tuple_atom'''
+    p[0] = p[1]
+
 
 def p_tuple_expression2(p):
     '''tuple_expression : tuple_expression tuple_operation tuple_atom'''
+    p[0] = ASTnode("tuple operation")
+    p[0].value = p[2]
+    p[0].child_atom1 = p[1]
+    p[0].child_atom2 = p[3]
+
 
 def p_tuple_operation(p):
     '''tuple_operation : DOUBLEPLUS'''
+    p[0] = p[1]
 
 
 def p_tuple_atom(p):
-    '''tuple_atom : tupleIDENT
-                  | LSQUARE constant_expression DOUBLEMULT constant_expression RSQUARE
-                  | LSQUARE constant_expression DOUBLEDOT  constant_expression RSQUARE
-                  | LSQUARE arguments RSQUARE'''
+    '''tuple_atom : tupleIDENT'''
+    p[0] = ASTnode("tuple identifier")
+    p[0].value = p[1]
 
 
-# def p_function_call(p):
-#     '''function_call : funcIDENT LSQUARE RSQUARE
-#                      | '''
+def p_tuple_atom_arguments(p):
+    '''tuple_atom : LSQUARE arguments RSQUARE'''
+    p[0] = p[2]
+
+
+def p_tuple_atom_function_call(p):
+    '''tuple_atom : function_call'''
+    p[0] = p[1]
+
+
+def p_tuple_atom_range(p):
+    '''tuple_atom : LSQUARE constant_expression DOUBLEMULT constant_expression RSQUARE
+                  | LSQUARE constant_expression DOUBLEDOT  constant_expression RSQUARE'''
+    p[0] = ASTnode("tuple range expression")
+    p[0].child_start = p[2]
+    p[0].child_end = p[4]
+
+
+def p_function_call(p):
+    '''function_call : funcIDENT LSQUARE RSQUARE'''
+    p[0] = ASTnode("function_call")
+    p[0].value = p[1]
+    p[0].children_arguments = []
+
+
+def p_function_call_arguments(p):
+    '''function_call : funcIDENT LSQUARE arguments RSQUARE'''
+    p[0] = ASTnode("function_call")
+    p[0].value = p[1]
+    p[0].children_arguments = p[3].children_argument
 
 
 def p_arguments(p):
-    '''arguments : simple_expression arguments
-                 | COMMA simple_expression
-                 | COMMA simple_expression arguments
-                 | simple_expression'''
-    #print("arguments")
+    '''arguments : simple_expression'''
+    p[0] = ASTnode("arguments")
+    p[0].children_argument = [p[1]]
+
+
+def p_arguments2(p):
+    '''arguments : arguments COMMA simple_expression'''
+    p[0] = p[1]
+    p[0].children_argument.append(p[3])
 
 
 def p_atom(p):
@@ -151,16 +228,21 @@ def p_atom(p):
             | STRING_LITERAL
             | varIDENT
             | constIDENT
-            | LPAREN simple_expression RPAREN
-            | SELECT COLON constant_expression LSQUARE tuple_expression RSQUARE'''
-    # if len(p) == 4:
-    #     print("atom")
-    # else:
-    #     print("atom( {} )".format(p[1]))
-    #p[0] = p[1]
+            | function_call'''
     p[0] = ASTnode(p.slice[1].type)
     p[0].value = p[1]
-    #p[0].child_atom = p[0]
+
+
+def p_atom_select(p):
+    '''atom : SELECT COLON constant_expression LSQUARE tuple_expression RSQUARE'''
+    p[0] = ASTnode("select")
+    p[0].child_const_exp = p[3]
+    p[0].child_tuple = p[5]
+
+
+def p_atom_parentheses(p):
+    '''atom : LPAREN simple_expression RPAREN'''
+    p[0] = p[2]
 
 
 def p_unary_operator(p):
@@ -169,77 +251,51 @@ def p_unary_operator(p):
 
 def p_factor(p):
     '''factor : atom'''
-    #p[0] = p[1]
-    p[0] = ASTnode("atom")
-    p[0].value = p[1].value
-    p[0].child_atom = p[1]
+    p[0] = p[1]
 
 
 def p_factor_minus(p):
     '''factor : unary_operator atom %prec UMINUS'''
-    p[0] = ASTnode("atom")
+    p[0] = p[2]
     p[0].value = -p[2].value
 
 
 def p_term(p):
     '''term : factor'''
-    #p[0] = p[1]
-    p[0] = ASTnode("factor")
-    p[0].value = p[1].value
-    p[0].children_factor = [p[1]]
+    p[0] = p[1]
 
 
 def p_term_mult(p):
     '''term : term MULT factor'''
-    p[0] = p[1]#ASTnode("term")
-    print("{} {} {}".format(p[1],p[3],p[3].value))
-    p[0].value = p[1].value * p[3].value
-    p[0].children_factor.append(p[3])
-    #p[0].children_factor[1].child_operator = p[2]
+    p[0] = ASTnode("multiplication operation")
+    p[0].child_term1 = p[1]
+    p[0].child_term2 = p[3]
 
 
 def p_term_div(p):
     '''term : term DIV factor'''
-    p[0] = p[1]#= ASTnode("term")
-    print("{} {} {} {}".format(p[1].nodetype, p[1].value, p[3].nodetype, p[3].value))
-    try:
-        p[0].value = p[1].value / p[3].value
-        #p[0].child_factor = p[1]
-        p[0].children_factor.append(p[3])
-        p[0].children_operator = p[2]
-    except ZeroDivisionError:
-        parser.errorfunc(p)
-        #yacc.YaccProduction.parser
-        print("ERROR: Division by zero")
-        raise SystemExit
+    p[0] = ASTnode("division operation")
+    p[0].child_numerator = p[1]
+    p[0].child_denominator = p[3]
 
 
 def p_simple_expression_term(p):
     '''simple_expression : term'''
-    p[0] = ASTnode("simple_expression")
-    p[0].value = p[1].value
-    p[0].child_term = p[1]
+    p[0] = p[1]
 
 
 def p_simple_expression_minus(p):
     '''simple_expression : simple_expression MINUS term'''
-    print("{} {}".format(p[1].value, p[3].value))
-    p[0] = p[1]#ASTnode("minus_expression")
-    p[0].children_terms = []
-    p[0].children_terms.append(p[1])
-    p[0].children_terms.append(p[3])
-    p[0].child_operator = ASTnode("MINUS")
-    p[0].value = p[1].value - p[3].value
+    p[0] = ASTnode("minus_expression")
+    p[0].child_term1 = p[1]
+    p[0].child_term2 = p[3]
 
 
 def p_simple_expression_plus(p):
     '''simple_expression : simple_expression PLUS term'''
     p[0] = ASTnode("plus_expression")
-    p[0].children_terms = []
-    p[0].children_terms.append(p[1])
-    p[0].children_terms.append(p[3])
-    p[0].child_operator = ASTnode("PLUS")
-    p[0].value = p[1].value + p[3].value
+    p[0].child_term1 = p[1]
+    p[0].child_term2 = p[3]
 
 
 def p_error(p):
