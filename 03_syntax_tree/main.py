@@ -100,7 +100,6 @@ def p_variable_definitions_constant(p):
     p[0] = ASTnode("constant definition")
     p[0].value = p[1]
     p[0].child_expression = p[3]
-    print("const {}".format(p[1]))
 
 
 def p_variable_definitions_tuple(p):
@@ -108,14 +107,13 @@ def p_variable_definitions_tuple(p):
     p[0] = ASTnode("tuple_definition")
     p[0].value = p[1]
     p[0].child_expression = p[3]
-    print("tuple")
 
 
 def p_variable_definitions_tuple_pipe(p):
     '''variable_definitions : pipe_expression RARROW tupleIDENT DOT'''
     p[0] = ASTnode("tuple pipe definition")
     p[0].value = p[3]
-    p[0].child_pipe_expression = p[1]
+    p[0].child_pipe_operation = p[1]
 
 
 def p_constant_expression(p):
@@ -152,7 +150,7 @@ def p_pipe_operation_each(p):
 def p_each_statement(p):
     '''each_statement : EACH COLON funcIDENT'''
     p[0] = ASTnode("each_statement")
-    p[0].child_from = ASTnode(p[3])
+    p[0].child_function = ASTnode(p[3])
 
 
 def p_tuple_expression(p):
@@ -312,11 +310,18 @@ parser = yacc.yacc()
 if __name__ == '__main__':
     import argparse, codecs
     argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument('-t', '--treetype', help='Type of the tree (unicode/ascii/dot)')
     argument_group = argument_parser.add_mutually_exclusive_group()
     argument_group.add_argument('--who', action='store_true', help='author')
-    argument_group.add_argument('-f', '--file', help='<FILENAME>.tupl')
-
+    argument_group.add_argument('-f', '--file', help='<FILE>')
+    tree_formats = ('unicode', 'ascii', 'dot')
     input_args_parsed = argument_parser.parse_args()
+    t_format = 'unicode'
+
+    if input_args_parsed.treetype:
+        # if treetype is not valid will use the default value
+        if input_args_parsed.treetype in tree_formats:
+            t_format = input_args_parsed.treetype
     if input_args_parsed.who:
         print("Author: 283121 Tero Mielikäinen")
     elif input_args_parsed.file is None:
@@ -327,6 +332,6 @@ if __name__ == '__main__':
             with codecs.open(file, 'r') as INFILE:
                 data = INFILE.read()
                 result = parser.parse(data, lexer=lexer.lexer, debug=False)
-                tree_print.treeprint(result, "unicode")
+                tree_print.treeprint(result, t_format)
         except FileNotFoundError:
             print("File not found: '{}', maybe you forgot or mistyped the suffix".format(file))

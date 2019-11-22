@@ -1,27 +1,27 @@
 {<testi> <- [1..6].
 <p> <- [1,2,3] ++ <d> ++ <asd>.
-re <- -2+3+3.
-rerere <- 3-2.
-jeje <- (3/3)*(4/5)+2*3.
-<asd> <- [3,4,5].
-<ree> <- <asd>.
-[1,2,3,4,5] | + -> <ree>.
-<ree> -> <asd>.
+var1 <- -2+3+3.
+variable <- 3-2.
+another <- (3/3)*(4/5)+2*3.
+<tuple> <- [3,4,5].
+<anothertuple> <- <tuple>.
+[1,2,3,4,5] | + -> <anothertuple>.
+<tuples> -> <itisatuple>.
 CONST <- 4.
 GEE <- CONST.
-reeree <- select : 5 [<asd>].}
+vars <- select : 5 [<tuple>].}
 
-<p> <- [1,2,3] ++ <d> ++ <asd>.
-[1,2,3,4,5] | each : Funccis -> <ree>.
+<p> <- [1,2,3] ++ <d> ++ <tuple>.
+[1,2,3,4,5] | each : Funccis -> <tuple>.
 
 define Funccis [kek,ree,vii]
 begin
     asd <- 2.
     REE <- 2.
     www <- 3.
-    <tuple> <- [2,3].
+    <tuple> <- [2].
     = asd.
 end.
 
 <d> <- Funccis[3,4,5].
-= "keke".
+= "End value".
