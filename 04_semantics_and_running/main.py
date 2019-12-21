@@ -28,12 +28,13 @@ if __name__ == '__main__':
             with codecs.open(file, 'r') as INFILE:
                 data = INFILE.read()
                 syn_tree = tree_builder.parser.parse(data, lexer=lexer.lexer, debug=False)
-                #tree_print.treeprint(syn_tree)
+                tree_print.treeprint(syn_tree)
 
                 semdata = SemData()
                 semdata.in_function = None
-                semantic_checker.do_checks(syn_tree, semdata)
-
+                check_result = semantic_checker.do_checks(syn_tree, semdata)
+                if check_result is None:
+                    print("semantics ok")
         except FileNotFoundError:
             print("File not found: '{}'".format(file))
             argument_parser.print_help()

@@ -43,14 +43,28 @@ def p_function_definition(p):
                              END DOT'''
     p[0] = ASTnode("function_definition")
     p[0].value = p[2]
+
     p[0].children_formals = p[4].children_formals
+    p[0].children_variables = p[7].children_variables
+    p[0].child_return_value = p[8]
 
 
 def p_function_variable_definitions(p):
-    '''function_variable_definitions : variable_definitions
-                                     | function_variable_definitions variable_definitions
-                                     | '''
+    '''function_variable_definitions : variable_definitions'''
+    p[0] = ASTnode("function_var_definition")
+    p[0].children_variables = [p[1]]
+
+
+def p_function_several_variables(p):
+    '''function_variable_definitions : function_variable_definitions variable_definitions'''
     p[0] = p[1]
+    p[0].children_variables.append(p[2])
+
+
+def p_function_variables_empty(p):
+    '''function_variable_definitions : '''
+    p[0] = ASTnode("function_var_definition")
+    p[0].children_variables = []
 
 
 def p_formals_var(p):
@@ -90,14 +104,14 @@ def p_return_value_noteq(p):
 
 def p_variable_definitions_var(p):
     '''variable_definitions : varIDENT LARROW simple_expression DOT'''
-    p[0] = ASTnode("variable definition")
+    p[0] = ASTnode("var_definition")
     p[0].value = p[1]
     p[0].child_expression = p[3]
 
 
 def p_variable_definitions_constant(p):
     '''variable_definitions : constIDENT LARROW constant_expression DOT'''
-    p[0] = ASTnode("constant definition")
+    p[0] = ASTnode("const_definition")
     p[0].value = p[1]
     p[0].child_expression = p[3]
 
@@ -111,7 +125,7 @@ def p_variable_definitions_tuple(p):
 
 def p_variable_definitions_tuple_pipe(p):
     '''variable_definitions : pipe_expression RARROW tupleIDENT DOT'''
-    p[0] = ASTnode("tuple pipe definition")
+    p[0] = ASTnode("tuple_pipe_definition")
     p[0].value = p[3]
     p[0].child_pipe_operation = p[1]
 
@@ -173,7 +187,7 @@ def p_tuple_operation(p):
 
 def p_tuple_atom(p):
     '''tuple_atom : tupleIDENT'''
-    p[0] = ASTnode("tuple identifier")
+    p[0] = ASTnode("tupleIDENT")
     p[0].value = p[1]
 
 
@@ -225,10 +239,14 @@ def p_atom(p):
     '''atom : NUMBER_LITERAL
             | STRING_LITERAL
             | varIDENT
-            | constIDENT
-            | function_call'''
+            | constIDENT'''
     p[0] = ASTnode(p.slice[1].type)
     p[0].value = p[1]
+
+
+def p_atom_function_call(p):
+    '''atom : function_call'''
+    p[0] = p[1]
 
 
 def p_atom_select(p):
@@ -335,3 +353,12 @@ if __name__ == '__main__':
                 tree_print.treeprint(result, t_format)
         except FileNotFoundError:
             print("File not found: '{}', maybe you forgot or mistyped the suffix".format(file))
+
+
+'''
+Fixed comments:
+Documentation mentions functions added now, regarding functions: Variable definitions and return value 
+inside function definition are not present in the tree. Also functions without variables crash the program.
+* In line such as result <- Simple_plus[3,5]. the function call expression prinst bit of hexacode as the value.
+Or could be a function call with expression as formals.
+'''

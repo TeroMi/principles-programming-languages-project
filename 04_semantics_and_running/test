@@ -14,17 +14,27 @@ vars <- select : 5 [<tuple>].
 <p> <- [1,2,3] ++ <d> ++ <tuple>.
 [1,2,3,4,5] | each : Funccis -> <tuple>.
 
-define Funccis [kek,ree,vii]
+
+
+<d> <- Funccis[3,4,5].
+
+result <- Simple_plus[3,5,3].}
+
+define Funccis [wasd]
 begin
-    asd <- 2.
-    REE <- 2.
+    testi <- wasd.
     www <- 3.
-    <tuple> <- [2].
-    = asd.
+    = www.
 end.
+asd <- 2.
+<a> <- Funccis[asd].
 
-<d> <- Funccis[3,4,5].}
-
-var <- "2".
-asd <- var.
+{<d> <- [1,2,3].
+<tuples> -> <itisatuple>.
+asd <- 1.
+vas <- asd.
+JASS <- 1.
+VAR <- 2.
+KEK <- VAR.
+}
 = "End value".
