@@ -4,12 +4,25 @@ from semantics_common import visit_tree, SymbolData, SemData
 # check all variable, constant, tuple and function definitions and add them to symbol table
 def populate_symbol_table(node, semdata):
     symtbl = semdata.symtbl
-
     if node.nodetype == 'var_definition':
         if node.value not in symtbl.keys():
+            nodevalue = ""
+            nodevaluetype = ""
+            # operations are listed here because they break the check if not handled
+            if node.child_expression.nodetype == "plus_expression":
+                print("plus")
+            elif node.child_expression.nodetype == "minus_expression":
+                print("minus")
+            elif node.child_expression.nodetype == "mult_operation":
+                print("mult")
+            elif node.child_expression.nodetype == "div_operation":
+                print("div")
+            elif node.child_expression.nodetype in ("NUMBER_LITERAL", "STRING_LITERAL", "varIDENT", "constIDENT", "tupleIDENT", "funcIDENT"):
+                nodevalue = node.child_expression.value
+                nodevaluetype = type(node.child_expression.value)
             symtbl[node.value] = {"node_type": node.nodetype,
-                                  "value": node.child_expression.value,
-                                  "type": type(node.child_expression.value),
+                                  "value": nodevalue,
+                                  "type": nodevaluetype,
                                   "function_variable": False}
         else:
             symtbl[node.value]["value"] = node.child_expression.value
@@ -27,19 +40,25 @@ def populate_symbol_table(node, semdata):
             symtbl[node.value]["defined"] = True
 
     elif node.nodetype == 'tuple_definition':
-        print("tuple def: '{}' '{}'".format(node.nodetype, node.value))
+
         if hasattr(node.child_expression, "children_argument"):
-            for argument in node.child_expression.children_argument:
-                asd = 1
-                #print(argument.value)
+            nodevalue = "arguments"
+            # for argument in node.child_expression.children_argument:
+            #    print(argument.value)
         elif node.child_expression.nodetype == "function_call" and hasattr(node.child_expression, "children_arguments"):
-            for argument in node.child_expression.children_arguments:
-                asd = 1
-                #print(argument.value)
+            nodevalue = node.child_expression.value
+            # for argument in node.child_expression.children_arguments:
+            #    print(argument.value)
+        else:
+            nodevalue = node.child_expression.value
+
+        if node.value not in symtbl.keys():
+            symtbl[node.value] = {"node_type": node.nodetype,
+                                  "value": nodevalue}
+        else:
+            symtbl[node.value]["value"] = nodevalue
 
     elif node.nodetype == 'function_definition':
-        print("func def: '{}' '{}'".format(node.nodetype, node))
-
         if node.value not in symtbl.keys():
             symtbl[node.value] = {"node_type": node.nodetype,
                                   "value": node.child_return_value.child_expression.value,
@@ -53,7 +72,6 @@ def populate_symbol_table(node, semdata):
 
         if len(node.children_formals) > 0:
             for formal in node.children_formals:
-                #print(formal.value)
                 if formal.value not in symtbl.keys():
                     symtbl[formal.value] = {"node_type": formal.nodetype,
                                             "value": "to_be_defined",
@@ -61,7 +79,6 @@ def populate_symbol_table(node, semdata):
                                             "function_variable": True}
         if len(node.children_variables) > 0:
             for variable in node.children_variables:
-                print(variable.value)
                 if hasattr(variable.child_expression, "value") and variable.value in symtbl.keys():
                     symtbl[variable.value]["value"] = variable.child_expression
                     symtbl[variable.value]["function_variable"] = True
@@ -85,10 +102,12 @@ def populate_symbol_table(node, semdata):
             symtbl[node.value]["value"] = None
 
     elif node.nodetype == 'tupleIDENT':
-        print("tuple ident: '{}' '{}'".format(node.nodetype, node.value))
+        if node.value not in symtbl.keys():
+            symtbl[node.value] = {"node_type": node.nodetype, "value": None}
+        else:
+            symtbl[node.value]["value"] = None
 
     elif node.nodetype == 'function_call':
-        print("function_call: '{}' '{}'".format(node.nodetype, node.value))
         if node.value not in symtbl.keys():
             symtbl[node.value] = {"node_type": node.nodetype, "value": None, "defined": False}
         else:
@@ -107,7 +126,7 @@ def check_symbol_table(node, semdata):
                 return "Variable '{}' not defined or used before definition!".format(name)
             elif semdata.symtbl[name]["node_type"] in ('constIDENT', 'const_definition'):
                 return "Constant '{}' not defined or used before definition!".format(name)
-            elif semdata.symtbl[name]["node_type"] in ('tupleIDENT', 'tuple_definiton'):
+            elif semdata.symtbl[name]["node_type"] in ('tupleIDENT', 'tuple_definition'):
                 return "Tuple '{}' not defined or used before definition!".format(name)
             elif semdata.symtbl[name]["node_type"] in ('function_call', 'function_definition'):
                 return "Function '{}' not defined or used before definition!".format(name)

@@ -283,16 +283,16 @@ def p_term(p):
 
 def p_term_mult(p):
     '''term : term MULT factor'''
-    p[0] = ASTnode("multiplication operation")
+    p[0] = ASTnode("mult_operation")
     p[0].child_term1 = p[1]
     p[0].child_term2 = p[3]
 
 
 def p_term_div(p):
     '''term : term DIV factor'''
-    p[0] = ASTnode("division operation")
-    p[0].child_numerator = p[1]
-    p[0].child_denominator = p[3]
+    p[0] = ASTnode("div_operation")
+    p[0].child_term1 = p[1]
+    p[0].child_term2 = p[3]
 
 
 def p_simple_expression_term(p):

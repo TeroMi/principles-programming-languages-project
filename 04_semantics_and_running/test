@@ -18,21 +18,24 @@ vars <- select : 5 [<tuple>].
 
 <d> <- Funccis[3,4,5].
 
-result <- Simple_plus[3,5,3].}
+result <- Simple_plus[3,5,3].
 
 define Funccis [wasd]
 begin
     testi <- wasd.
-    www <- 3.
+    www <- 3+2.
     = www.
-end.
-asd <- 2.
-<a> <- Funccis[asd].
+end.}
+var <- 1.
+asd <- var * 2.
 
-{<d> <- [1,2,3].
+{vr <- 3.
+var <- 23.
+
+<d> <- [1,2,3].
 <tuples> -> <itisatuple>.
 asd <- 1.
-vas <- asd.
+vas <- asd+1 .
 JASS <- 1.
 VAR <- 2.
 KEK <- VAR.
