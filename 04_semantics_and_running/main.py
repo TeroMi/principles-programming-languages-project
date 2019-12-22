@@ -6,6 +6,7 @@ import lexer
 import tree_builder
 import tree_print
 import semantic_checker
+import semantic_run
 
 
 if __name__ == '__main__':
@@ -35,6 +36,8 @@ if __name__ == '__main__':
                 check_result = semantic_checker.do_checks(syn_tree, semdata)
                 if check_result is None:
                     print("semantics ok")
+                semantic_run.run_program(syn_tree, semdata)
+
         except FileNotFoundError:
             print("File not found: '{}'".format(file))
             argument_parser.print_help()

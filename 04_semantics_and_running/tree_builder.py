@@ -287,7 +287,6 @@ def p_term_mult(p):
     p[0].child_term1 = p[1]
     p[0].child_term2 = p[3]
 
-
 def p_term_div(p):
     '''term : term DIV factor'''
     p[0] = ASTnode("div_operation")

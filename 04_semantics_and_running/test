@@ -1,43 +1,7 @@
-{<testi> <- [1..6].
-<p> <- [1,2,3] ++ <d> ++ <asd>.
-var1 <- -2+3+3.
-variable <- 3-2.
-another <- (3/3)*(4/5)+2*3.
-<tuple> <- [3,4,5].
-<anothertuple> <- <tuple>.
-[1,2,3,4,5] | + -> <anothertuple>.
-<tuples> -> <itisatuple>.
-CONST <- 4.
-GEE <- CONST.
-vars <- select : 5 [<tuple>].
 
-<p> <- [1,2,3] ++ <d> ++ <tuple>.
-[1,2,3,4,5] | each : Funccis -> <tuple>.
-
-
-
-<d> <- Funccis[3,4,5].
-
-result <- Simple_plus[3,5,3].
-
-define Funccis [wasd]
-begin
-    testi <- wasd.
-    www <- 3+2.
-    = www.
-end.}
-var <- 1.
-asd <- var * 2.
-
-{vr <- 3.
-var <- 23.
-
-<d> <- [1,2,3].
-<tuples> -> <itisatuple>.
-asd <- 1.
-vas <- asd+1 .
-JASS <- 1.
-VAR <- 2.
-KEK <- VAR.
-}
-= "End value".
+plus <- 2+2.
+mult <- 5*4.
+div <- 5/4.
+minus <- 1-2.
+KEK <- 2.
+= KEK.
